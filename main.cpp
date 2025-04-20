@@ -3,14 +3,15 @@
 #include <string>
 #include "parser.h"
 
-bool ProgramFetch(std::string &filename ,Parser &parser);
+bool ProgramFetch(const std::string &filename ,Parser &parser);
 //std::string ProgramStore(std::string name);
 
 //global variables
 
 
-
 int main (){
+    InstructionMemory instructionMemory1;
+    Parser parser(instructionMemory1);
     std::string ProgramName;
     int CycleCount = 1; // this keeps track of the current cycle
     bool SimulationComplete =1;
@@ -20,15 +21,20 @@ int main (){
     std::cin >> Filename ;
 
     // This function uses the file name to extract the data from it and send it to the parser
-    programFetch(Filename, parser);
-
+    ProgramFetch(Filename, parser);
+    if (ProgramFetch == 0) {
+        std::cout << "The program has been loaded into memory" << std::endl;
+    } else {
+        std::cout << "The program was not loaded into memory" << std::endl;
+        return 1; // Exit if program fetch fails
+    }
 //   ProgramStore(ProgramName);
     
 
 
-    while (!SimulationComplete) { //while loop keeps running as long as SimulationComplete doesn't go true
+ /*   while (!SimulationComplete) { //while loop keeps running as long as SimulationComplete doesn't go true
         std::cout << "Currnet Cycle Count: " << CycleCount << std::endl ;
-/*
+
         updateWriteBackStage();  
         updateMemoryStage();
         updateExecuteStage();
@@ -36,7 +42,7 @@ int main (){
         updateInstructionFetchStage();
 
         updatePipelineRegisters();
-*/
+
         CycleCount +=1;
 
         //simulation results per cycle
@@ -44,7 +50,7 @@ int main (){
         std::cout << "Currnet Cycle Count: " << CycleCount << '\n' ;
         std::cout << "Currnet Cycle Count: " << CycleCount << '\n';
     }
-
+*/
     int Totalinstructionsissued;
     int Totalinstructionsexecuted;
     int AverageCPI = Totalinstructionsexecuted/CycleCount ;
@@ -66,7 +72,7 @@ int main (){
 
 
 
-bool ProgramFetch(std::string &filename , Parser &parser) { 
+bool ProgramFetch(const std::string &filename , Parser &parser) { 
     std::string line;  
     std::ifstream file(filename);
     if(!file.is_open()){
@@ -75,7 +81,7 @@ bool ProgramFetch(std::string &filename , Parser &parser) {
     else{
         
         while(std::getline(file,line)){
-            Parser.readline(line);
+            parser.parseline(line);
 
         }
 

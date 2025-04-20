@@ -1,17 +1,24 @@
-#ifndef instructionmemory.h
-#define instructionmemory.h
 
+#ifndef INSTRUCTIONMEMORY_H
+#define INSTRUCTIONMEMORY_H
+
+#include <vector>
+#include "instruction.h"
+
+// Stores parsed instructions and provides fetch access by program counter.
 class InstructionMemory {
-    public:
-        
-        InstructionMemory();
-    
-        int add(int a, int b);
+public:
+    // Add a parsed instruction to the end of memory
+    void addInstruction(const Instruction &instr);
 
-        int subtract(int a, int b); 
+    // Fetch the instruction at index 'pc'
+    Instruction fetch(size_t pc) const;
 
-        bool branchifequal(int a , int b);
-        
-    };
+    // Get the total number of instructions loaded
+    size_t size() const;
 
-#endif
+private:
+    std::vector<Instruction> m_instructions;
+};
+
+#endif // INSTRUCTIONMEMORY_H

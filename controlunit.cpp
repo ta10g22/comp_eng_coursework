@@ -23,4 +23,4 @@
 
     // pipeline registers 
 
-    IF_ID 
+  
