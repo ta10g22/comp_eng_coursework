@@ -1,25 +1,26 @@
 #include "controlunit.h"
+#include "instructionmemory.h"
+#include <iostream>
+#include "hazardunit.h"
 
     ControlUnit::ControlUnit(){}
 
-    int ControlUnit::add(int a , int b){
-        int result = a + b;
-        return result;
+    int ControlUnit::UpdateInstructionFetch(){
+       
+    }
+    int ControlUnit::UpdateInstructionDecode(){
+       
+    }
+    int ControlUnit::UpdateInstructionExecute(){
+      
+    }
+    int ControlUnit::UpdateMemoryAccess(){
+        
+    }
+    int ControlUnit::UpdateWriteBack(){
+        
     }
 
-    int ControlUnit::subtract(int a , int b){
-        int result = a - b;
-        return result;
-    }
+    // pipeline registers 
 
-    bool ControlUnit::branchifequal(int a , int b){
-        int result;
-        if (a == b){
-            bool result = 0; // if equal the alu sets the zero flag for the control unit to branch
-        }
-        else{
-            bool result = 1;
-        }
-        return result;
-    }
-
+    IF_ID 

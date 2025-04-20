@@ -6,12 +6,11 @@ class ControlUnit {
         
         ControlUnit();
     
-        int add(int a, int b);
-
-        int subtract(int a, int b); 
-
-        bool branchifequal(int a , int b);
-        
+        int UpdateInstrucionFetch();
+        int UpdateInstructionDecode();
+        int UpdateInstructionExecute();
+        int UpdateMemoryAccess();
+        int UpdateWriteBack();
     };
 
 

@@ -6,6 +6,7 @@
 bool ProgramFetch(std::string &filename ,Parser &parser);
 //std::string ProgramStore(std::string name);
 
+//global variables
 
 
 
@@ -15,25 +16,15 @@ int main (){
     bool SimulationComplete =1;
 
     std::string Filename;
-    std::cout << "input the name of the file you will like to simulate" << std::endl;
+    std::cout << "input the name of the mips assembly file you will like to simulate" << std::endl;
     std::cin >> Filename ;
 
     // This function uses the file name to extract the data from it and send it to the parser
-     if (ProgramFetch(Filename ,parser)) {
-        std::cout << "File has been read!"
-     }
+    programFetch(Filename, parser);
+
 //   ProgramStore(ProgramName);
     
-    
-/*
-    if(){
-        SimulationComplete =1;
 
-    }
-    else{
-        SimulationComplete = 0;
-    }
-*/
 
     while (!SimulationComplete) { //while loop keeps running as long as SimulationComplete doesn't go true
         std::cout << "Currnet Cycle Count: " << CycleCount << std::endl ;
@@ -56,12 +47,16 @@ int main (){
 
     int Totalinstructionsissued;
     int Totalinstructionsexecuted;
-
     int AverageCPI = Totalinstructionsexecuted/CycleCount ;
+    int TotalStalls; // Placeholder for stall count
 
+
+    
     //Total program simualation results
     std::cout << "Total number of instructions issued by the program: " << Totalinstructionsissued << std::endl;
     std::cout << "Total number of instructions executed: " << Totalinstructionsexecuted << std::endl;
+    std::cout << "Total number of cycles: " << CycleCount << std::endl;
+    std::cout << "Total number of stalls: " << TotalStalls << std::endl; 
     std::cout << "Average Cycle per instruction(CPI): " << AverageCPI << std::endl;
     std::cout << "Program Finsished!" << std::endl;
 
@@ -81,7 +76,7 @@ bool ProgramFetch(std::string &filename , Parser &parser) {
         
         while(std::getline(file,line)){
             Parser.readline(line);
-;l'
+
         }
 
         file.close();
@@ -89,28 +84,3 @@ bool ProgramFetch(std::string &filename , Parser &parser) {
     }
 }
 
-
-/*
-std::string ProgramStore(std::string name){
-
-}
-*/
-
-
-/*
-    limited instruction set:
-    add
-    subtract
-    loadword
-    storeword
-    branch (beq)
-
-
-
-
-    if extra time :
-    and
-    or
-    jump
-
-*/
