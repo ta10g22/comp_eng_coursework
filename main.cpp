@@ -11,8 +11,8 @@ bool ProgramFetch(const std::string &filename ,Parser &parser);
 
 
 int main (){
-    InstructionMemory instructionMemory1;
-    Parser parser(instructionMemory1);
+    InstructionMemory instructionMemory;
+    Parser parser(instructionMemory);
     std::string ProgramName;
     int CycleCount = 1; // this keeps track of the current cycle
     bool SimulationComplete =1;
@@ -22,8 +22,8 @@ int main (){
     std::cin >> Filename ;
 
     // This function uses the file name to extract the data from it and send it to the parser
-    ProgramFetch(Filename, parser);
-    if (ProgramFetch == 0) {
+    bool Fetchstatus = ProgramFetch(Filename, parser);
+    if (Fetchstatus == 0) {
         std::cout << "The program has been loaded into memory" << std::endl;
     } else {
         std::cout << "The program was not loaded into memory" << std::endl;
@@ -78,11 +78,12 @@ bool ProgramFetch(const std::string &filename , Parser &parser) {
     std::ifstream file(filename);
     if(!file.is_open()){
         std::cout << "Error opening file" << std::endl ;
+        return 1;
     }
     else{
         
         while(std::getline(file,line)){
-            parser.parseline(line);
+            parser.parseLine(line);
 
         }
 
