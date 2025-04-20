@@ -1,7 +1,7 @@
  # make file for mips computer simulation program :)
 
 simulation: main.o alu.o controlunit.o datamemory.o hazardunit.o instructionmemory.o parser.o programcounter.o registerfile.o
-	g++ main.o alu.o controlunit.o datamemory.o hazardunit.o instructionmemory.o parser.o programcounter.o registerfile.o -o simulation
+	g++ main.o alu.o controlunit.o datamemory.o hazardunit.o instructionmemory.o parser.o programcounter.o instruction.o registerfile.o -o simulation
 
 main.o: main.cpp
 	g++ -c main.cpp
@@ -29,6 +29,9 @@ programcounter.o: programcounter.cpp programcounter.h
 
 registerfile.o: registerfile.cpp registerfile.h
 	g++ -c registerfile.cpp
+
+instruction.o : instruction.cpp instruction.h
+	g++ -c instruction.cpp
 
 
 clean:

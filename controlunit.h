@@ -5,8 +5,8 @@ class ControlUnit {
     public:
         
         ControlUnit();
-    
-        int UpdateInstrucionFetch();
+        
+        int UpdateInstructionFetch();
         int UpdateInstructionDecode();
         int UpdateInstructionExecute();
         int UpdateMemoryAccess();

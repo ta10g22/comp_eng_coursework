@@ -1,5 +1,6 @@
-#ifndef parser.h
-#define parser.h
+#ifndef PARSER_H
+#define PARSER_H
+
 
 #include <string>
 #include "instructionmemory.h"   // So we can call InstructionMemory::addInstruction
@@ -23,4 +24,4 @@ private:
     int registerStringToNumber(const std::string &reg);
 };
 
-#endif // parser.h
+#endif // PARSER_H
