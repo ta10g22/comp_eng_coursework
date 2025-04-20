@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "parser.h"
+#include "instructionmemory.h"
 
 bool ProgramFetch(const std::string &filename ,Parser &parser);
 //std::string ProgramStore(std::string name);
