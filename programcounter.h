@@ -1,5 +1,5 @@
-#ifndef programcounter.h
-#define programcounter.h
+#ifndef PROGRAMCOUNTER_H
+#define PROGRAMCOUNTER_H 
 
 class ProgramCounter {
     public:

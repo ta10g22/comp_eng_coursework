@@ -1,5 +1,5 @@
-#ifndef hazardunit.h
-#define hazardunit.h
+#ifndef HAZARDUNIT_H
+#define HAZARDUNIT_H  
 
 class HazardUnit {
     public:

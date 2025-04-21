@@ -23,11 +23,11 @@ int main (){
 
     // This function uses the file name to extract the data from it and send it to the parser
     bool Fetchstatus = ProgramFetch(Filename, parser);
-    if (Fetchstatus == 0) {
+    if (Fetchstatus) {
         std::cout << "The program has been loaded into memory" << std::endl;
-    } else {
+    } else if (Fetchstatus == false) {
         std::cout << "The program was not loaded into memory" << std::endl;
-        return 1; // Exit if program fetch fails
+        
     }
 //   ProgramStore(ProgramName);
     
@@ -51,7 +51,13 @@ int main (){
         std::cout << "Currnet Cycle Count: " << CycleCount << '\n' ;
         std::cout << "Currnet Cycle Count: " << CycleCount << '\n';
     }
+        
 */
+
+std::cout << "Loaded " << instructionMemory1.size()
+<< " instructions\n";
+
+
     int Totalinstructionsissued;
     int Totalinstructionsexecuted;
     int AverageCPI = Totalinstructionsexecuted/CycleCount ;
@@ -78,7 +84,7 @@ bool ProgramFetch(const std::string &filename , Parser &parser) {
     std::ifstream file(filename);
     if(!file.is_open()){
         std::cout << "Error opening file" << std::endl ;
-        return 1;
+        return false;
     }
     else{
         
@@ -88,7 +94,7 @@ bool ProgramFetch(const std::string &filename , Parser &parser) {
         }
 
         file.close();
-        return 0;
+        return true;
     }
 }
 

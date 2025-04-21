@@ -1,5 +1,5 @@
-#ifndef  datamemory.h
-#define datamemory.h
+#ifndef  DATAMEMORY_H
+#define DATAMEMORY_H
 
 class DataMemory {
     public:

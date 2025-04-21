@@ -10,8 +10,17 @@ Parser::Parser(InstructionMemory &instrMem)
 // It breaks the line into tokens, builds an Instruction,
 // and then stores it.
 void Parser::parseLine(const std::string &line) {
+
+
     // 1) skip empty lines or lines that start with '#'
     if (line.empty() || line[0] == '#') return;
+
+    // after skipping empty or comment lines …
+    if (line.back() == ':') {
+    // This is a label definition line like "loop:" → skip for now
+    // (store it later when you add a symbol‑table step)
+    return;
+}
 
     // 2) turn the line into a stream so we can >> into strings
     std::istringstream iss(line);
@@ -39,7 +48,13 @@ void Parser::parseLine(const std::string &line) {
         iss >> rt >> comma >> addr;  
         // addr looks like "100($t0)" — split at '('
         auto pos = addr.find('(');
-        instr.immediate = std::stoi(addr.substr(0, pos));
+        if (pos == std::string::npos) {
+           std::cerr << "Parser error: bad address syntax: " << addr << '\n';
+        return;
+     }
+        std::string offsetStr = addr.substr(0, pos);
+        instr.immediate = offsetStr.empty() ? 0 : std::stoi(offsetStr);
+        
         std::string rs = addr.substr(pos+1, addr.find(')') - pos - 1);
         instr.rs = registerStringToNumber(rs);
         instr.rt = registerStringToNumber(rt);
@@ -89,6 +104,7 @@ int Parser::registerStringToNumber(const std::string &reg) {
 
     if (reg == "$v0")   return 2;
     if (reg == "$v1")   return 3;
+
     if (reg == "$a0")   return 4;
     if (reg == "$a1")   return 5;
     if (reg == "$a2")   return 6;

@@ -1,5 +1,5 @@
-#ifndef controlunit.h
-#define controlunit.h
+#ifndef CONTROLUNIT_H
+#define CONTROLUNIT_H
 
 class ControlUnit {
     public:

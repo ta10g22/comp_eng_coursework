@@ -1,5 +1,5 @@
-#ifndef registerfile.h
-#define registerfile.h
+#ifndef PROGRAMCOUNTER_H 
+#define PROGRAMCOUNTER_H 
 
 class RegisterFile {
     public:
