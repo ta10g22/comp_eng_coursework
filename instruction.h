@@ -10,6 +10,7 @@ struct Instruction {
     int rs;               // source register 1
     int rt;               // source register 2 or target register (for I-type)
     int immediate;        // immediate value or offset
+    int address;         // address for jumps (if applicable)
     std::string label;    // branch or jump label (if any)
 
     // Default constructor initializes fields to safe defaults

@@ -7,6 +7,8 @@
 
 // Stores parsed instructions and provides fetch access by program counter.
 class InstructionMemory {
+    private:
+    std::vector<Instruction> m_instructions;
 public:
     // Add a parsed instruction to the end of memory
     void addInstruction(const Instruction &instr);
@@ -17,8 +19,6 @@ public:
     // Get the total number of instructions loaded
     size_t size() const;
 
-private:
-    std::vector<Instruction> m_instructions;
 };
 
 #endif // INSTRUCTIONMEMORY_H

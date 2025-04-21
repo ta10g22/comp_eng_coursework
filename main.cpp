@@ -11,8 +11,8 @@ bool ProgramFetch(const std::string &filename ,Parser &parser);
 
 
 int main (){
-    InstructionMemory instructionMemory;
-    Parser parser(instructionMemory);
+    InstructionMemory instructionMemory1;
+    Parser parser(instructionMemory1);
     std::string ProgramName;
     int CycleCount = 1; // this keeps track of the current cycle
     bool SimulationComplete =1;
