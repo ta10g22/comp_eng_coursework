@@ -14,7 +14,7 @@ void Parser::parseLine(const std::string &line) {
 
     // 1) skip empty lines or lines that start with '#'
     if (line.empty() || line[0] == '#') return;
-
+    
     // after skipping empty or comment lines …
     if (line.back() == ':') {
     // This is a label definition line like "loop:" → skip for now
@@ -40,21 +40,20 @@ void Parser::parseLine(const std::string &line) {
         instr.rs = registerStringToNumber(rs);
         instr.rt = registerStringToNumber(rt);
 
+
         // I -TYPE with offsets stored in immediate added to address in "rs"
     } else if (opcode == "lw" || opcode == "sw") {
         // I-type memory: lw rt, offset(rs)
         std::string rt, addr;
         char comma;
         iss >> rt >> comma >> addr;  
+        
         // addr looks like "100($t0)" — split at '('
         auto pos = addr.find('(');
-        if (pos == std::string::npos) {
-           std::cerr << "Parser error: bad address syntax: " << addr << '\n';
-        return;
-     }
+
         std::string offsetStr = addr.substr(0, pos);
         instr.immediate = offsetStr.empty() ? 0 : std::stoi(offsetStr);
-        
+
         std::string rs = addr.substr(pos+1, addr.find(')') - pos - 1);
         instr.rs = registerStringToNumber(rs);
         instr.rt = registerStringToNumber(rt);
@@ -77,12 +76,21 @@ void Parser::parseLine(const std::string &line) {
         instr.rs = registerStringToNumber(rs);
         instr.rt = registerStringToNumber(rt);
         instr.label = label;     // you’ll resolve labels yourself later
+        
 
     } else if (opcode == "j") { 
         // J-type: J address
         std::string address;
         iss >> address;
-        instr.address = std::stoi(address); // convert string to int
+        instr.label = address;
+
+        // instr.address = std::stoi(address); // convert string to int
+
+    } else if(opcode == "nop"){
+          return;
+        
+    } else if (opcode == "#") {
+        return;  // skip comments that don't start immediately at the beginning of the line 
 
 
     } else {

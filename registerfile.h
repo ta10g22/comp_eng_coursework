@@ -1,18 +1,25 @@
-#ifndef PROGRAMCOUNTER_H 
-#define PROGRAMCOUNTER_H 
+#ifndef REGISTERFILE_H
+#define REGISTERFILE_H 
+
+#include <array>
+
+
 
 class RegisterFile {
-    public:
-        
-        RegisterFile();
-    
-        int add(int a, int b);
+public:
+    RegisterFile();  // constructor should set all registers to 0
 
-        int subtract(int a, int b); 
+    // Read a value stored in register reg(0‑31).  
+    int read(int reg) const;
 
-        bool branchifequal(int a , int b);
-        
-    };
+    // Write a'value' into register 'reg'.
+    void write(int reg, int value);
 
+    // function that will display whats stored in all registers.
+    void dump() const;
 
-#endif
+private:
+    std::array<int, 32> m_regs;    //The std::array has useful methods like fill() and size() so prefer over m_regs[32]
+};
+
+#endif 

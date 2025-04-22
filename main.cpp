@@ -1,3 +1,7 @@
+/* Notes 
+keep in mind the temporary fix stuff you made for lw & sw instructions
+
+*/
 #include <iostream>
 #include <fstream>
 #include <string>
