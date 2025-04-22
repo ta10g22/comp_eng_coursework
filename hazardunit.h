@@ -6,9 +6,9 @@ class HazardUnit {
 
     HazardUnit();
 
-        int forward();
+        void forward();
          
-        int stall();
+        void stall();
         
 };
 

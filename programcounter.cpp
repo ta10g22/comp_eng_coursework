@@ -1,24 +1,15 @@
 #include "programcounter.h"
 
-ProgramCounter::ProgramCounter(){}
+ProgramCounter::ProgramCounter() : m_pc(0) {}  //constructor and initialization list to make program counter start at 0
 
-int ProgramCounter::add(int a , int b){
-    int result = a + b;
-    return result;
+int ProgramCounter::value() const {
+    return m_pc;                    
 }
 
-int ProgramCounter::subtract(int a , int b){
-    int result = a - b;
-    return result;
+void ProgramCounter::set(int newPC) {
+    m_pc = newPC;                     //jump to new byte address
 }
 
-bool ProgramCounter::branchifequal(int a , int b){
-    int result;
-    if (a == b){
-        bool result = 0; // if equal the alu sets the zero flag for the control unit to branch
-    }
-    else{
-        bool result = 1;
-    }
-    return result;
+void ProgramCounter::step() {
+    m_pc += 4;     // next instruction (byte address)
 }

@@ -33,7 +33,6 @@ int main (){
         std::cout << "The program was not loaded into memory" << std::endl;
         
     }
-//   ProgramStore(ProgramName);
     
 
 
@@ -45,15 +44,16 @@ int main (){
         updateExecuteStage();
         updateInstructionDecodeStage();
         updateInstructionFetchStage();
-
         updatePipelineRegisters();
 
+
+        programcounter.step();
         CycleCount +=1;
 
         //simulation results per cycle
         std::cout << "Currnet Cycle Count: " << CycleCount << '\n' ;
-        std::cout << "Currnet Cycle Count: " << CycleCount << '\n' ;
-        std::cout << "Currnet Cycle Count: " << CycleCount << '\n';
+        std::cout << "The program Counter is at byte address: " << Programcounter.value() << '\n' ;
+     
     }
         
 */
@@ -62,10 +62,10 @@ std::cout << "Loaded " << instructionMemory1.size()
 << " instructions\n";
 
 
-    int Totalinstructionsissued;
-    int Totalinstructionsexecuted;
+    int Totalinstructionsissued = 0;
+    int Totalinstructionsexecuted = 0;
     int AverageCPI = Totalinstructionsexecuted/CycleCount ;
-    int TotalStalls; // Placeholder for stall count
+    int TotalStalls = 0; // Placeholder for stall count
 
 
     
