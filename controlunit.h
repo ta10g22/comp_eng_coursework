@@ -41,7 +41,7 @@ class ControlUnit {
         MEMWB mem_wb, mem_wb_next;
     
         // forward select lines (0=none,1=EX/MEM,2=MEM/WB)
-        int fwdA{0}, fwdB{0};
+        int fwdA, fwdB;
     };
     
     #endif 

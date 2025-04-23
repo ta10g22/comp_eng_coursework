@@ -11,5 +11,5 @@ void ProgramCounter::set(int newPC) {
 }
 
 void ProgramCounter::step() {
-    m_pc += 4;     // next instruction (byte address)
+    m_pc += 1;     // next instruction (byte address)
 }

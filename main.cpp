@@ -3,6 +3,7 @@ keep in mind the temporary fix stuff you made for lw & sw instructions
 why is the PC member funtion value constant 
 why is the program counter headerfile not included in the main file
 */
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -56,24 +57,23 @@ int main (){
 
    // Run pipeline for enough cycles to process all instructions
    for (int cycle = 1; cycle <= totalCycles; ++cycle) {
-       std::cout << "\n[Cycle " << cycle << "] PC = " << pc.value() << std::endl;
+    std::cout << "\n[Cycle " << cycle << "] PC = " << pc.value() << std::endl;
 
-       // Measure stall: old PC unchanged after IF indicates stall
-       int oldPC = pc.value();
-       cpu.UpdateInstructionFetch();
+    // Measure stall: old PC unchanged after IF indicates stall
+    int oldPC = pc.value();
+    cpu.UpdateInstructionFetch();
        if (pc.value() == oldPC) {
            ++stallCount;
            std::cout << "  Stall inserted (load-use hazard)" << std::endl;
        }
 
-       cpu.UpdateInstructionDecode();
-       cpu.UpdateInstructionExecute();
-       cpu.UpdateMemoryAccess();
-       cpu.UpdateWriteBack();
-       cpu.updatePipelineRegisters();
-
-       // Dump register file for observability
-       registerfile.dump();
+    cpu.UpdateInstructionDecode();
+    cpu.UpdateInstructionExecute();
+    cpu.UpdateMemoryAccess();
+    cpu.UpdateWriteBack();
+    cpu.updatePipelineRegisters();
+      
+    registerfile.dump(); // Dump register file for observability
    }
 
 

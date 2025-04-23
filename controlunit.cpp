@@ -11,6 +11,7 @@ ControlUnit::ControlUnit(InstructionMemory& imem,
   , m_pc(pc)
   , m_alu()
   , m_hazard()
+  ,fwdA(0), fwdB(0)
 {
     // clear valid flags
     if_id.valid = id_ex.valid = ex_mem.valid = mem_wb.valid = false;
@@ -71,7 +72,7 @@ int ControlUnit::UpdateInstructionExecute() {
     else if (op == "sub") { aluOut = m_alu.subtract(operandA, operandB); writeReg=id_ex.rd; }
     else if (op == "addi") { aluOut = m_alu.add(operandA, id_ex.immediate); writeReg=id_ex.rt; }
     else if (op=="lw"||op=="sw") { aluOut = m_alu.add(operandA, id_ex.immediate); writeReg = id_ex.rt; }
-    else if (op=="beq") { takeBranch = m_alu.branchifequal(operandA, operandB); branchTarget=id_ex.immediate; }
+    else if (op=="beq") { takeBranch  = m_alu.branchifequal(operandA, operandB); branchTarget=id_ex.immediate; }
     else if (op=="j") { takeBranch=true; branchTarget=id_ex.immediate; }
 
     ex_mem_next.opcode = op;
