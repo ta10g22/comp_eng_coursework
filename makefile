@@ -1,39 +1,29 @@
- # make file for mips computer simulation program :)
+# ------------------------------------------------------------
+#  Makefile for MIPS-like pipeline simulator
+# ------------------------------------------------------------
 
-simulation: main.o alu.o controlunit.o datamemory.o hazardunit.o instructionmemory.o parser.o programcounter.o registerfile.o
-	g++ main.o alu.o controlunit.o datamemory.o hazardunit.o instructionmemory.o parser.o programcounter.o registerfile.o -o simulation
+CXX      := g++
+CXXFLAGS := -std=c++11 -Wall -Wextra -O2     # C++11 + good warnings
+LDFLAGS  := $(CXXFLAGS)
 
+OBJS := main.o alu.o controlunit.o datamemory.o \
+        hazardunit.o instructionmemory.o parser.o \
+        programcounter.o registerfile.o
+
+# Default target ------------------------------------------------
+simulation: $(OBJS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o simulation
+
+# Pattern rule for every .cpp → .o --------------------------------
+%.o: %.cpp %.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# main.cpp doesn’t have a matching .h, so list it separately
 main.o: main.cpp
-	g++ -c main.cpp
+	$(CXX) $(CXXFLAGS) -c main.cpp
 
-alu.o: alu.cpp alu.h
-	g++ -c alu.cpp 
-
-controlunit.o: controlunit.cpp controlunit.h
-	g++ -c controlunit.cpp
-
-datamemory.o: datamemory.cpp datamemory.h
-	g++ -c datamemory.cpp
-
-hazardunit.o: hazardunit.cpp hazardunit.h
-	g++ -c hazardunit.cpp
-
-instructionmemory.o: instructionmemory.cpp instructionmemory.h
-	g++ -c instructionmemory.cpp
-
-parser.o: parser.cpp parser.h
-	g++ -c parser.cpp
-
-programcounter.o: programcounter.cpp programcounter.h
-	g++ -c programcounter.cpp
-
-registerfile.o: registerfile.cpp registerfile.h
-	g++ -c registerfile.cpp
-
+# Clean ----------------------------------------------------------
 clean:
-	rm *.o simulation
+	rm -f $(OBJS) simulation
 
-
-# target: dependencies
-#	 action
-
+.PHONY: clean
