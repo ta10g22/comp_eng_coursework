@@ -1,44 +1,48 @@
+// PipelineRegs.h
 #ifndef PIPELINEREGS_H
 #define PIPELINEREGS_H
 
 #include "instruction.h"
-#include <string> // for opcodes
+#include <string>
 
 // IF/ID pipeline register:
 struct IFID {
     Instruction instr;  // fetched instruction
-    int pcPlus1;        // next instruction for branch
-    bool valid;         // tell us if the pipeline register holds a proper instruction?
+    int         pcPlus1;// next-instruction index
+    bool        valid;  // is this slot holding real work?
 };
 
 // ID/EX pipeline register:
 struct IDEX {
-    std::string opcode; // operation name
-    int rs, rt, rd;     // register indices
-    int rsVal, rtVal;   // register values
-    int immediate;      // immediate value
-    int pcPlus1;        // PC+1 for branches
-    bool valid;         // is this register valid?
+    Instruction instr;   // the instruction being decoded
+    std::string opcode;  // duplicate of instr.opcode (for convenience)
+    int         rs, rt, rd;
+    int         rsVal, rtVal;
+    int         immediate;
+    int         pcPlus1;
+    bool        valid;
 };
 
 // EX/MEM pipeline register:
 struct EXMEM {
-    std::string opcode;  // operation name
-    int aluResult;       // result from ALU
-    int rtVal;           // value to store (SW)
-    int writeReg;        // destination register index
-    bool branchTaken;    // did we take a branch?
-    int branchTarget;    // where to jump if branch is taken
-    bool valid;          // is this register valid?
+    Instruction instr;   // the instruction being executed
+    std::string opcode;
+    int         aluResult;
+    int         rtVal;
+    int         writeReg;
+    bool        branchTaken;
+    int         branchTarget;
+    bool        valid;
 };
 
 // MEM/WB pipeline register:
 struct MEMWB {
-    std::string opcode;  // operation name
-    int memData;         // data loaded from memory
-    int aluResult;       // ALU result for R-type/addi
-    int writeReg;        // destination register index
-    bool valid;          // is this register valid?
+    Instruction instr;   // the instruction in write-back
+    std::string opcode;
+    int         memData;
+    int         aluResult;
+    int         writeReg;
+    bool        valid;
 };
 
-#endif
+#endif // PIPELINEREGS_H

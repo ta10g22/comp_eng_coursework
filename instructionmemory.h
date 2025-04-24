@@ -19,6 +19,8 @@ public:
     // Get the total number of instructions loaded
     size_t size() const;
 
+    void dumpInstructions() const; // Display all instructions in memory
+
 };
 
 #endif // INSTRUCTIONMEMORY_H

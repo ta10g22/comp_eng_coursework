@@ -50,6 +50,10 @@ int main (){
    if (!ProgramFetch(filename, parser)) return 1;
    std::cout << "Loaded " << instructionmemory.size() << " instructions into memory.\n";
 
+   // display instruction stored in instruction memory
+    instructionmemory.dumpInstructions();
+
+
    // Simulation parameters
    int numInstr = instructionmemory.size();
    int totalCycles = numInstr + 4;  // pipeline depth = 5 => flush requires 4 extra cycles

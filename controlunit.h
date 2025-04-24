@@ -8,41 +8,49 @@
 #include "alu.h"
 #include "programcounter.h"
 #include "hazardunit.h"
+#include <iostream>
+#include <string>
 
-
-// ControlUnit with Hazard detection + Forwarding
+// ControlUnit with Hazard detection, forwarding, and pipeline observability
 class ControlUnit {
-    public:
-        ControlUnit(InstructionMemory& imem,
-                    RegisterFile&      regs,
-                    DataMemory&        dmem,
-                    ProgramCounter&    pc);
-    
-        int UpdateInstructionFetch();   // IF stage
-        int UpdateInstructionDecode();  // ID stage
-        int UpdateInstructionExecute(); // EX stage
-        int UpdateMemoryAccess();       // MEM stage
-        int UpdateWriteBack();          // WB stage
-    
-        void updatePipelineRegisters(); // move "next" → "current"
-    
-    private:
-        InstructionMemory& m_imem;
-        RegisterFile&      m_regs;
-        DataMemory&        m_dmem;
-        ProgramCounter&    m_pc;
-        ALU                m_alu;
-        HazardUnit         m_hazard;
-    
-        // pipeline registers
-        IFID  if_id,  if_id_next;
-        IDEX  id_ex,  id_ex_next;
-        EXMEM ex_mem, ex_mem_next;
-        MEMWB mem_wb, mem_wb_next;
-    
-        // forward select lines (0=none,1=EX/MEM,2=MEM/WB)
-        int fwdA, fwdB;
-    };
-    
-    #endif 
-    
+public:
+    ControlUnit(InstructionMemory& imem,
+                RegisterFile&      regs,
+                DataMemory&        dmem,
+                ProgramCounter&    pc);
+
+    // Pipeline stage methods
+    int UpdateInstructionFetch();
+    int UpdateInstructionDecode();
+    int UpdateInstructionExecute();
+    int UpdateMemoryAccess();
+    int UpdateWriteBack();
+
+    // Advance pipeline registers each cycle and then display state
+    void updatePipelineRegisters();
+
+private:
+    InstructionMemory& m_imem;
+    RegisterFile&      m_regs;
+    DataMemory&        m_dmem;
+    ProgramCounter&    m_pc;
+    ALU                m_alu;
+    HazardUnit         m_hazard;
+
+    // pipeline registers: current and next
+    IFID  if_id,    if_id_next;
+    IDEX  id_ex,    id_ex_next;
+    EXMEM ex_mem,   ex_mem_next;
+    MEMWB mem_wb,   mem_wb_next;
+
+    // forward select lines
+    int fwdA, fwdB;
+
+    // Utility: print current pipeline state
+    void printPipelineState() const;
+
+    // Utility: format an instruction for display
+    std::string formatInstr(const Instruction& instr) const;
+};
+
+#endif // CONTROLUNIT_H
