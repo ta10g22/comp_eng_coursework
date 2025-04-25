@@ -93,9 +93,20 @@ int ControlUnit::UpdateInstructionExecute() {
     } else if (op == "beq") {
         ex_mem_next.branchTaken  = m_alu.branchifequal(opA, opB);
         ex_mem_next.branchTarget = id_ex.immediate;
+        if (ex_mem_next.branchTaken) {
+            // resolve branch at EX stage
+            m_pc.set(ex_mem_next.branchTarget);
+            // optionally flush IF/ID
+            if_id_next.valid = false;
+            id_ex_next.valid = false;
+        }
     } else if (op == "j") {
         ex_mem_next.branchTaken  = true;
         ex_mem_next.branchTarget = id_ex.immediate;
+        // resolve jump at EX stage
+        m_pc.set(ex_mem_next.branchTarget);
+        if_id_next.valid = false;
+        id_ex_next.valid = false;
     }
     ex_mem_next.valid = true;
     return 0;
@@ -115,9 +126,7 @@ int ControlUnit::UpdateMemoryAccess() {
     } else if (ex_mem.opcode == "sw") {
         m_dmem.storeWord(ex_mem.aluResult, ex_mem.rtVal);
     }
-    if (ex_mem.branchTaken) {
-        m_pc.set(ex_mem.branchTarget);
-    }
+    // branch resolution moved to EX stage
     mem_wb_next.valid = true;
     return 0;
 }

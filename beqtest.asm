@@ -1,16 +1,32 @@
-# beqtest.asm – exercises BEQ taken and not‐taken paths, then halts
+# Test MIPS jump instruction — ends cleanly
+# Exercises both forward and backward jumps without using only the `j` instruction
 
-main:
-    addi $t0, $zero, 5     # $t0 = 5
-    addi $t1, $zero, 5     # $t1 = 5
-    beq  $t0, $t1, br1     # taken → jump to br1
-    addi $t2, $zero, 0     # skipped when branch is taken
-br1:
-    addi $t2, $zero, 1     # $t2 = 1 if branch was taken
+    addi $t0, $zero, 0     # i = 0
+    addi $t1, $zero, 0     # square = 0
+    addi $t2, $zero, 0     # addr = 0 (byte offset into data memory)
+    addi $t4, $zero, 200  # limit = 200
 
-    addi $t3, $zero, 7     # $t3 = 7
-    addi $t4, $zero, 8     # $t4 = 8
-    beq  $t3, $t4, skip2   # not taken → fall through
-    addi $t5, $zero, 1     # $t5 = 1 when branch is not taken
-skip2:
-    nop                    # natural fall-off, sim stops when PC > 9
+    # Forward jump: skip over the next two instructions
+    j  Forward
+    nop
+    addi $t0, $zero, 1   # skipped
+    addi $t1, $zero, 2   # skipped
+
+Forward:
+    addi $t2, $zero, 3   # executed after forward jump
+
+    # Backward jump: jump back to 'backward' label
+    j  backward
+    nop
+
+    # These instructions are skipped by the backward jump
+    addi $t3, $zero, 4
+    addi $t4, $zero, 5
+
+backward:
+    addi $t5, $zero, 6   # executed after backward jump
+
+    # Jump to exit
+    j  Exit
+    nop
+Exit:

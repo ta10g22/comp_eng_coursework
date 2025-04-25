@@ -61,6 +61,7 @@ void Parser::parseFile(const std::string& filename) {
             ++instrIdx;
         }
     }
+    
     for (auto &p : m_labelMap) {
     std::cerr << "[DEBUG] label '" << p.first
               << "' → instr index " << p.second << "\n";

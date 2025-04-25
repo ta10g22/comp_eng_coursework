@@ -9,19 +9,6 @@
 #include "programcounter.h"
 #include "controlunit.h"
 
-bool ProgramFetch(const std::string &filename, Parser &parser) { 
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cout << "Error opening file\n";
-        return false;
-    }
-    std::string line;
-    while (std::getline(file, line)) {
-        parser.parseLine(line);
-    }
-    return true;
-}
-
 int main() {
     InstructionMemory instructionmemory;
     Parser            parser(instructionmemory);
@@ -33,7 +20,9 @@ int main() {
     std::cout << "Enter MIPS assembly filename to simulate: ";
     std::string filename;
     std::cin >> filename;
-    if (!ProgramFetch(filename, parser)) return 1;
+
+    // Two-pass parse: first build labels, then emit instructions
+    parser.parseFile(filename);
 
     int numInstr = instructionmemory.size();
     std::cout << "Loaded " << numInstr << " instructions.\n";
