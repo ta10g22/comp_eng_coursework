@@ -5,8 +5,11 @@
 #include <algorithm>
 #include <cctype>
 #include <vector>
+#include <fstream>
 
+// ----------------------------------------------------------------------------
 // Trim whitespace from both ends
+// ----------------------------------------------------------------------------
 static std::string trim(const std::string& s) {
     auto l = s.find_first_not_of(" \t\r\n");
     if (l == std::string::npos) return "";
@@ -14,7 +17,9 @@ static std::string trim(const std::string& s) {
     return s.substr(l, r - l + 1);
 }
 
+// ----------------------------------------------------------------------------
 // Remove inline comments (from '#' onwards)
+// ----------------------------------------------------------------------------
 static std::string stripComment(const std::string& s) {
     auto pos = s.find('#');
     return (pos == std::string::npos) ? s : s.substr(0, pos);
@@ -22,18 +27,68 @@ static std::string stripComment(const std::string& s) {
 
 Parser::Parser(InstructionMemory& instrMem)
   : m_instrMem(instrMem)
+  , m_currentInstrIndex(0)
 {}
 
-void Parser::parseLine(const std::string& rawLine) {
-    // 1) Strip comments, trim whitespace
-    std::string line = trim(stripComment(rawLine));
-    if (line.empty()) return;
+// ----------------------------------------------------------------------------
+// Parse an entire file in two passes:
+//  1) scan for labels
+//  2) resolve labels and emit instructions
+// ----------------------------------------------------------------------------
+void Parser::parseFile(const std::string& filename) {
+    std::ifstream in(filename);
+    if (!in) {
+        std::cerr << "Failed to open '" << filename << "'\n";
+        return;
+    }
 
-    // 2) Skip label definitions (e.g., "Loop:")
-    if (line.back() == ':') return;
+    // read all lines
+    std::vector<std::string> lines;
+    std::string raw;
+    while (std::getline(in, raw)) {
+        lines.push_back(raw);
+    }
 
-    // 3) Extract opcode and raw arguments
-    std::istringstream iss(line);
+    // 1) first pass: record label → instruction index
+    int instrIdx = 0;
+    for (auto& rl : lines) {
+        std::string content = trim(stripComment(rl));
+        if (content.empty()) continue;
+        if (content.back() == ':') {
+            std::string lbl = content.substr(0, content.size() - 1);
+            m_labelMap[lbl] = instrIdx;
+        } else {
+            ++instrIdx;
+        }
+    }
+    for (auto &p : m_labelMap) {
+    std::cerr << "[DEBUG] label '" << p.first
+              << "' → instr index " << p.second << "\n";
+}
+
+    // 2) second pass: actually parse + emit
+    m_currentInstrIndex = 0;
+    for (auto& rl : lines) {
+        parseLine(rl);
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Parse a single line: if it's a label, record it; otherwise build an Instruction
+// ----------------------------------------------------------------------------
+void Parser::parseLine(const std::string& line) {
+    std::string text = trim(stripComment(line));
+    if (text.empty()) return;
+
+    // label definition?
+    if (text.back() == ':') {
+        std::string lbl = text.substr(0, text.size() - 1);
+        m_labelMap[lbl] = m_currentInstrIndex;
+        return;
+    }
+
+    // split opcode + args
+    std::istringstream iss(text);
     std::string opcode;
     iss >> opcode;
     std::string args;
@@ -43,58 +98,86 @@ void Parser::parseLine(const std::string& rawLine) {
     Instruction instr;
     instr.opcode = opcode;
 
-    // 4) Split arguments by commas
+    // split args by comma
     std::vector<std::string> fields;
     std::istringstream argss(args);
-    std::string field;
-    while (std::getline(argss, field, ',')) {
-        fields.push_back(trim(field));
+    std::string fld;
+    while (std::getline(argss, fld, ',')) {
+        fields.push_back(trim(fld));
     }
 
-    // 5) Decode based on opcode
+    // decode different opcodes
     if (opcode == "nop") {
-        // no fields
+        // nothing to do
     }
     else if (opcode == "add" || opcode == "sub") {
-        if (fields.size() != 3) { std::cerr << "Parser error: " << opcode << " expects 3 operands\n"; return; }
+        if (fields.size() != 3) {
+            std::cerr << "Parser error: " << opcode << " expects 3 operands\n";
+            return;
+        }
         instr.rd = registerStringToNumber(fields[0]);
         instr.rs = registerStringToNumber(fields[1]);
         instr.rt = registerStringToNumber(fields[2]);
     }
     else if (opcode == "addi") {
-        if (fields.size() != 3) { std::cerr << "Parser error: addi expects 3 operands\n"; return; }
+        if (fields.size() != 3) {
+            std::cerr << "Parser error: addi expects 3 operands\n";
+            return;
+        }
         instr.rt        = registerStringToNumber(fields[0]);
         instr.rs        = registerStringToNumber(fields[1]);
         instr.immediate = std::stoi(fields[2]);
     }
     else if (opcode == "lw" || opcode == "sw") {
-        if (fields.size() != 2) { std::cerr << "Parser error: " << opcode << " expects 2 operands\n"; return; }
+        if (fields.size() != 2) {
+            std::cerr << "Parser error: " << opcode << " expects 2 operands\n";
+            return;
+        }
         instr.rt = registerStringToNumber(fields[0]);
-        // fields[1] is "offset(base)"
+        // parse offset(base)
         auto p1 = fields[1].find('(');
         auto p2 = fields[1].find(')', p1);
-        std::string off = fields[1].substr(0, p1);
-        instr.immediate = off.empty() ? 0 : std::stoi(trim(off));
+        std::string off  = fields[1].substr(0, p1);
+        instr.immediate  = off.empty() ? 0 : std::stoi(trim(off));
         std::string base = fields[1].substr(p1 + 1, p2 - p1 - 1);
         instr.rs = registerStringToNumber(trim(base));
     }
     else if (opcode == "beq") {
-        if (fields.size() != 3) { std::cerr << "Parser error: beq expects 3 operands\n"; return; }
+        if (fields.size() != 3) {
+            std::cerr << "Parser error: beq expects 3 operands\n";
+            return;
+        }
         instr.rs    = registerStringToNumber(fields[0]);
         instr.rt    = registerStringToNumber(fields[1]);
         instr.label = fields[2];
+        auto it = m_labelMap.find(instr.label);
+        if (it == m_labelMap.end()) {
+            std::cerr << "Parser error: undefined label '" << instr.label << "'\n";
+            return;
+        }
+        instr.immediate = it->second;
     }
     else if (opcode == "j") {
-        if (fields.size() != 1) { std::cerr << "Parser error: j expects 1 operand\n"; return; }
+        if (fields.size() != 1) {
+            std::cerr << "Parser error: j expects 1 operand\n";
+            return;
+        }
         instr.label = fields[0];
+        auto it = m_labelMap.find(instr.label);
+        if (it == m_labelMap.end()) {
+            std::cerr << "Parser error: undefined label '" << instr.label << "'\n";
+            return;
+        }
+        instr.immediate = it->second;
     }
     else {
-        std::cerr << "Parser error: unknown opcode '" << opcode << "' in line: " << rawLine << std::endl;
+        std::cerr << "Parser error: unknown opcode '" << opcode << "' in line: " << text << "\n";
         return;
     }
 
-    // 6) Store instruction
+    // store the instruction and advance
     m_instrMem.addInstruction(instr);
+    ++m_currentInstrIndex;
 }
 
 int Parser::registerStringToNumber(const std::string& reg) const {
@@ -130,6 +213,6 @@ int Parser::registerStringToNumber(const std::string& reg) const {
     if (reg == "$sp")   return 29;
     if (reg == "$fp")   return 30;
     if (reg == "$ra")   return 31;
-    std::cerr << "Parser warning: unknown register '" << reg << "'" << std::endl;
+    std::cerr << "Parser warning: unknown register '" << reg << "'\n";
     return 0;
 }

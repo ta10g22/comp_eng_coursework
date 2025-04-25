@@ -34,15 +34,15 @@ lw   $s6, 16($zero)      # $s6 = 25
 addi $t7, $zero, 3       # $t7 = 3
 Loop:
     sub $t7, $t7, $t0    # $t7 -= $t0
-    beq $t7, $zero, Done # if $t7 == 0, jump to Done
+    beq  $t7, $zero, done   # if $t7 == 0, jump to Done
     j Loop
 
 # Some extra unused instructions to simulate pipeline flush
 add  $a0, $t0, $t1       # fake
 add  $a1, $t1, $t2       # fake
-add  $a2, $t2, $t3       # fake
+add  $a2, $t2, $t3       # fake   //mistake cause to jump to beginning of loop
 
-Done:
+done:
     nop
     nop
     nop

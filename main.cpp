@@ -1,9 +1,3 @@
-/* Notes 
-keep in mind the temporary fix stuff you made for lw & sw instructions
-why is the PC member funtion value constant 
-why is the program counter headerfile not included in the main file
-*/
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -15,83 +9,73 @@ why is the program counter headerfile not included in the main file
 #include "programcounter.h"
 #include "controlunit.h"
 
-bool ProgramFetch(const std::string &filename , Parser &parser) { 
-    std::string line;  
+bool ProgramFetch(const std::string &filename, Parser &parser) { 
     std::ifstream file(filename);
-    if(!file.is_open()){
-        std::cout << "Error opening file" << std::endl ;
+    if (!file.is_open()) {
+        std::cout << "Error opening file\n";
         return false;
     }
-    else{
-        while(std::getline(file,line)){
-            parser.parseLine(line);
-        }
-
-        file.close();
-        return true;
+    std::string line;
+    while (std::getline(file, line)) {
+        parser.parseLine(line);
     }
+    return true;
 }
 
+int main() {
+    InstructionMemory instructionmemory;
+    Parser            parser(instructionmemory);
+    DataMemory        datamemory;
+    RegisterFile      registerfile;
+    ProgramCounter    pc;
+    ControlUnit       cpu(instructionmemory, registerfile, datamemory, pc);
 
-int main (){
-     // Instantiation of all modules used
-     InstructionMemory instructionmemory;
-     Parser            parser(instructionmemory);
-     DataMemory        datamemory;
-     RegisterFile      registerfile;
-     ProgramCounter    pc;
-     ControlUnit       cpu(instructionmemory, registerfile, datamemory, pc);
+    std::cout << "Enter MIPS assembly filename to simulate: ";
+    std::string filename;
+    std::cin >> filename;
+    if (!ProgramFetch(filename, parser)) return 1;
 
-    
-   // Load program
-   std::cout << "input the name of the mips assembly file you will like to simulate: " << std::endl;
-   std::string filename;
-   std::cin >> filename;
-   if (!ProgramFetch(filename, parser)) return 1;
-   std::cout << "Loaded " << instructionmemory.size() << " instructions into memory.\n";
-
-   // display instruction stored in instruction memory
+    int numInstr = instructionmemory.size();
+    std::cout << "Loaded " << numInstr << " instructions.\n";
     instructionmemory.dumpInstructions();
 
+    int stallCount = 0;
+    int cycle = 1;
 
-   // Simulation parameters
-   int numInstr = instructionmemory.size();
-   int totalCycles = numInstr + 4;  // pipeline depth = 5 => flush requires 4 extra cycles
-   int stallCount = 0;
+    // Run until we've fetched every real instr AND flushed all bubbles
+    do {
+        std::cout << "\n[Cycle " << cycle << "] PC = " << pc.value() << "\n";
 
-   // Run pipeline for enough cycles to process all instructions
-   for (int cycle = 1; cycle <= totalCycles; ++cycle) {
-    std::cout << "\n[Cycle " << cycle << "] PC = " << pc.value() << std::endl;
+        int oldPC = pc.value();
+        cpu.UpdateInstructionFetch();
+        if (pc.value() == oldPC) {
+            ++stallCount;
+            std::cout << "  Stall inserted (load-use hazard)\n";
+        }
 
-    // Measure stall: old PC unchanged after IF indicates stall
-    int oldPC = pc.value();
-    cpu.UpdateInstructionFetch();
-       if (pc.value() == oldPC) {
-           ++stallCount;
-           std::cout << "  Stall inserted (load-use hazard)" << std::endl;
-       }
+        cpu.UpdateInstructionDecode();
+        cpu.UpdateInstructionExecute();
+        cpu.UpdateMemoryAccess();
+        cpu.UpdateWriteBack();
+        cpu.updatePipelineRegisters();
 
-    cpu.UpdateInstructionDecode();
-    cpu.UpdateInstructionExecute();
-    cpu.UpdateMemoryAccess();
-    cpu.UpdateWriteBack();
-    cpu.updatePipelineRegisters();
-      
-    registerfile.dump(); // Dump register file for observability
-   }
+        registerfile.dump();
 
+        ++cycle;
+    }
+    while (pc.value() < numInstr || cpu.pipelineNotEmpty());
 
-    // Final statistics
-    int instrIssued = totalCycles - stallCount;
-    int instrExecuted = numInstr;  // one per loaded instruction
-    double avgCPI = static_cast<double>(totalCycles) / instrExecuted;
+    int totalCycles   = cycle - 1;
+    int instrIssued   = totalCycles - stallCount;
+    int instrExecuted = numInstr;
+    double avgCPI     = double(totalCycles) / instrExecuted;
 
-    std::cout << "\n=== Simulation Complete ===" << std::endl;
-    std::cout << "Total Instructions Issued:  " << instrIssued << std::endl;
-    std::cout << "Total Instructions Executed:" << instrExecuted << std::endl;
-    std::cout << "Total Cycles:               " << totalCycles << std::endl;
-    std::cout << "Total Stalls:               " << stallCount << std::endl;
-    std::cout << "Average CPI:                " << avgCPI << std::endl;
+    std::cout << "\n=== Simulation Complete ===\n"
+              << "Total Instructions Issued:   " << instrIssued   << "\n"
+              << "Total Instructions Executed: " << instrExecuted << "\n"
+              << "Total Cycles:                " << totalCycles   << "\n"
+              << "Total Stalls:                " << stallCount    << "\n"
+              << "Average CPI:                 " << avgCPI        << "\n";
 
     return 0;
 }

@@ -20,15 +20,24 @@ ControlUnit::ControlUnit(InstructionMemory& imem,
 }
 
 int ControlUnit::UpdateInstructionFetch() {
+    // Stall on load-use hazard
     if (m_hazard.detectLoadUse(if_id, id_ex)) {
         if_id_next.valid = false;
         return 0;
     }
-    // FETCH stage
-    if_id_next.instr   = m_imem.fetch(m_pc.value());
-    if_id_next.pcPlus1 = m_pc.value() + 1;
-    if_id_next.valid   = true;
-    m_pc.step();
+
+    // If PC still within instruction memory, fetch instruction
+    if (m_pc.value() < static_cast<int>(m_imem.size())) {
+        if_id_next.instr   = m_imem.fetch(m_pc.value());
+        if_id_next.pcPlus1 = m_pc.value() + 1;
+        if_id_next.valid   = true;
+        m_pc.step();
+    } else {
+        // Past end of memory: inject NOP (bubble)
+        if_id_next.valid = false;
+        // Do NOT advance PC further
+    }
+
     return 0;
 }
 
@@ -169,4 +178,11 @@ void ControlUnit::printPipelineState() const {
               << "EX/MEM:  " << (ex_mem.valid  ? formatInstr(ex_mem.instr)  : "NOP") << "   |   "
               << "MEM/WB:  " << (mem_wb.valid  ? formatInstr(mem_wb.instr)  : "NOP")
               << std::endl;
+}
+
+bool ControlUnit::pipelineNotEmpty() const {
+    return if_id.valid
+        || id_ex.valid
+        || ex_mem.valid
+        || mem_wb.valid;
 }

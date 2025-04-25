@@ -28,6 +28,8 @@ public:
 
     // Advance pipeline registers each cycle and then display state
     void updatePipelineRegisters();
+    /// Returns true if any of the four pipeline registers still holds a valid instruction.
+    bool pipelineNotEmpty() const;
 
 private:
     InstructionMemory& m_imem;

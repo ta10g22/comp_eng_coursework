@@ -17,7 +17,7 @@
 Loop:
     sub  $t7, $t7, $t0        # $t7 = $t7 - $t0       (if $t0 = 0, unchanged)
     beq  $t7, $zero, End      # If $t7 == 0, go to End
-    j    Loop
+      j    Loop
 
 End:
     nop                       # End of program
