@@ -139,7 +139,7 @@ int ControlUnit::UpdateWriteBack() {
     } else if (mem_wb.opcode == "lw") {
         m_regs.write(mem_wb.writeReg, mem_wb.memData);
     }
-    return 0;
+    return 1;
 }
 
 void ControlUnit::updatePipelineRegisters() {

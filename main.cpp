@@ -28,6 +28,7 @@ int main() {
     std::cout << "Loaded " << numInstr << " instructions.\n";
     instructionmemory.dumpInstructions();
 
+    int retireCount = 0;
     int stallCount = 0;
     int cycle = 1;
 
@@ -45,7 +46,7 @@ int main() {
         cpu.UpdateInstructionDecode();
         cpu.UpdateInstructionExecute();
         cpu.UpdateMemoryAccess();
-        cpu.UpdateWriteBack();
+        retireCount +=cpu.UpdateWriteBack();
         cpu.updatePipelineRegisters();
 
         registerfile.dump();
@@ -56,13 +57,13 @@ int main() {
 
     int totalCycles   = cycle - 1;
     int instrIssued   = totalCycles - stallCount;
-    int instrExecuted = numInstr;
+    int instrExecuted = retireCount;
     double avgCPI     = double(totalCycles) / instrExecuted;
 
     std::cout << "\n=== Simulation Complete ===\n"
+              << "Total Cycles:                " << totalCycles   << "\n"
               << "Total Instructions Issued:   " << instrIssued   << "\n"
               << "Total Instructions Executed: " << instrExecuted << "\n"
-              << "Total Cycles:                " << totalCycles   << "\n"
               << "Total Stalls:                " << stallCount    << "\n"
               << "Average CPI:                 " << avgCPI        << "\n";
 
